@@ -66,9 +66,19 @@ func (s *Wasd) Move() {
 
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		for _, z := range entities {
-			if z.Wasd == nil {
-				z.Position.X += -s.Speed
+		atFloor := false
+		for _, z := range Floors {
+			//if z.Entity != s.Entity {
+			if s.Entity.Rect.Right.Overlaps(z.Entity.Rect.Left) && z.Entity != s.Entity {
+				atFloor = true
+				//}
+			}
+		}
+		if !atFloor {
+			for _, z := range entities {
+				if z.Wasd == nil {
+					z.Position.X += -s.Speed
+				}
 			}
 		}
 		//s.Entity.Position.X += s.Speed
@@ -131,10 +141,10 @@ func (s *Rect) setRect() {
 		int(s.Entity.Position.Y),
 		int(s.Entity.Position.X)+s.Width,
 		int(s.Entity.Position.Y)-s.Height)
-	s.Top = image.Rect(int(s.Entity.Position.X), int(s.Entity.Position.Y)-s.Height, int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)-s.Height+6)
-	s.Bottom = image.Rect(int(s.Entity.Position.X), int(s.Entity.Position.Y), int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)+6)
-	s.Right = image.Rect(int(s.Entity.Position.X)+s.Width-6, int(s.Entity.Position.Y), int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)+s.Height)
-	s.Left = image.Rect(int(s.Entity.Position.X)-6, int(s.Entity.Position.Y), int(s.Entity.Position.X), int(s.Entity.Position.Y)+s.Height)
+	s.Top = image.Rect(int(s.Entity.Position.X)-s.Width/2, int(s.Entity.Position.Y)-s.Height, int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)-s.Height+6)
+	s.Bottom = image.Rect(int(s.Entity.Position.X)-s.Width/2, int(s.Entity.Position.Y), int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)+6)
+	s.Right = image.Rect(int(s.Entity.Position.X)+s.Width-6, int(s.Entity.Position.Y)-s.Height/2, int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)+s.Height)
+	s.Left = image.Rect(int(s.Entity.Position.X)+6-s.Width, int(s.Entity.Position.Y)-s.Height/2, int(s.Entity.Position.X)-s.Width, int(s.Entity.Position.Y)+s.Height)
 }
 
 var Floors []*Floor
