@@ -51,6 +51,12 @@ func (s *Wasd) Move() {
 			//if z.Entity != s.Entity {
 			if s.Entity.Rect.Bottom.Overlaps(z.Entity.Rect.Top) && z.Entity != s.Entity {
 				atFloor = true
+				move := s.Entity.Position.Y - z.Entity.Position.Y + float64(s.Entity.Rect.Height) - 2
+				for _, z := range entities {
+					if z.Wasd == nil {
+						z.Position.Y += move
+					}
+				}
 				//}
 			}
 		}
@@ -85,9 +91,19 @@ func (s *Wasd) Move() {
 		//x = -C.Components.Player.MoveSpeed
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		for _, z := range entities {
-			if z.Wasd == nil {
-				z.Position.X += s.Speed
+		atFloor := false
+		for _, z := range Floors {
+			//if z.Entity != s.Entity {
+			if s.Entity.Rect.Left.Overlaps(z.Entity.Rect.Right) && z.Entity != s.Entity {
+				atFloor = true
+				//}
+			}
+		}
+		if !atFloor {
+			for _, z := range entities {
+				if z.Wasd == nil {
+					z.Position.X += s.Speed
+				}
 			}
 		}
 		//s.Entity.Position.X += -s.Speed
@@ -140,11 +156,28 @@ func (s *Rect) setRect() {
 	s.Rect = image.Rect(int(s.Entity.Position.X),
 		int(s.Entity.Position.Y),
 		int(s.Entity.Position.X)+s.Width,
-		int(s.Entity.Position.Y)-s.Height)
-	s.Top = image.Rect(int(s.Entity.Position.X)-s.Width/2, int(s.Entity.Position.Y)-s.Height, int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)-s.Height+6)
-	s.Bottom = image.Rect(int(s.Entity.Position.X)-s.Width/2, int(s.Entity.Position.Y), int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)+6)
-	s.Right = image.Rect(int(s.Entity.Position.X)+s.Width-6, int(s.Entity.Position.Y)-s.Height/2, int(s.Entity.Position.X)+s.Width, int(s.Entity.Position.Y)+s.Height)
-	s.Left = image.Rect(int(s.Entity.Position.X)+6-s.Width, int(s.Entity.Position.Y)-s.Height/2, int(s.Entity.Position.X)-s.Width, int(s.Entity.Position.Y)+s.Height)
+		int(s.Entity.Position.Y)+s.Height)
+	//.Add(image.Point{int(s.Entity.Position.X), int(s.Entity.Position.X)}
+	s.Top = image.Rect(
+		int(s.Entity.Position.X)+2,
+		int(s.Entity.Position.Y)-s.Height,
+		int(s.Entity.Position.X)+s.Width-2,
+		int(s.Entity.Position.Y)-s.Height+10)
+	s.Bottom = image.Rect(
+		int(s.Entity.Position.X)+2,
+		int(s.Entity.Position.Y),
+		int(s.Entity.Position.X)+s.Width-2,
+		int(s.Entity.Position.Y)-10)
+	s.Right = image.Rect(
+		int(s.Entity.Position.X)+s.Width-10,
+		int(s.Entity.Position.Y)+2,
+		int(s.Entity.Position.X)+s.Width,
+		int(s.Entity.Position.Y)+s.Height-2)
+	s.Left = image.Rect(
+		int(s.Entity.Position.X),
+		int(s.Entity.Position.Y)+2,
+		int(s.Entity.Position.X)+10,
+		int(s.Entity.Position.Y)+s.Height-2)
 }
 
 var Floors []*Floor

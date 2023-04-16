@@ -42,14 +42,14 @@ type Game struct{}
 
 func (g *Game) Update() error {
 
-	Wasds[0].Move()
+	//Wasds[0].Move()
 	for _, s := range Rects {
 		s.setRect()
 	}
 
-	/*for _, s := range Wasds {
+	for _, s := range Wasds {
 		s.Move()
-	}*/
+	}
 
 	for _, s := range Gravitys {
 		s.Pull()
