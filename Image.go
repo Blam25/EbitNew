@@ -34,80 +34,73 @@ type Wasd struct {
 
 var Wasds []*Wasd
 
+func (s *Wasd) movePlayer(speedx, speedy float64) {
+	for _, z := range entities {
+		if z.Wasd == nil {
+			z.Position.X += speedx
+			z.Position.Y += speedy
+		}
+	}
+
+}
+
+type Direction int
+
+const (
+	Left Direction = iota
+	Up
+	Right
+	Down
+)
+
+func (s *Rect) colliding(direction Direction) bool {
+	colliding := false
+	for _, z := range Floors {
+		var rect1 image.Rectangle
+		var rect2 image.Rectangle
+		switch direction {
+		case Left:
+			rect1 = s.Left
+			rect2 = z.Entity.Rect.Right
+		case Up:
+			rect1 = s.Top
+			rect2 = z.Entity.Rect.Bottom
+		case Right:
+			rect1 = s.Right
+			rect2 = z.Entity.Rect.Left
+		case Down:
+			rect1 = s.Bottom
+			rect2 = z.Entity.Rect.Top
+		}
+		if rect1.Overlaps(rect2) && z.Entity != s.Entity {
+			colliding = true
+			if direction == Down && s.Entity.Wasd != nil {
+				moveY := s.Entity.Position.Y - z.Entity.Position.Y + float64(s.Entity.Rect.Height) - 2
+				s.Entity.Wasd.movePlayer(0, moveY)
+			}
+		}
+	}
+	return colliding
+}
+
 func (s *Wasd) Move() {
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		for _, z := range entities {
-			if z.Wasd == nil {
-				z.Position.Y += s.Speed
-			}
-		}
-		//print("hej")
-		//s.Entity.Position.Y += -s.Speed
-		//y = C.Components.Player.MoveSpeed
+		s.movePlayer(0, s.Speed)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		atFloor := false
-		for _, z := range Floors {
-			//if z.Entity != s.Entity {
-			if s.Entity.Rect.Bottom.Overlaps(z.Entity.Rect.Top) && z.Entity != s.Entity {
-				atFloor = true
-				move := s.Entity.Position.Y - z.Entity.Position.Y + float64(s.Entity.Rect.Height) - 2
-				for _, z := range entities {
-					if z.Wasd == nil {
-						z.Position.Y += move
-					}
-				}
-				//}
-			}
+		if !s.Entity.Rect.colliding(Down) {
+			s.movePlayer(0, -s.Speed)
 		}
-		if !atFloor {
-			for _, z := range entities {
-				if z.Wasd == nil {
-					z.Position.Y += -s.Speed
-				}
-			}
-		}
-		//s.Entity.Position.Y += s.Speed
-		//y = -C.Components.Player.MoveSpeed
-
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		atFloor := false
-		for _, z := range Floors {
-			//if z.Entity != s.Entity {
-			if s.Entity.Rect.Right.Overlaps(z.Entity.Rect.Left) && z.Entity != s.Entity {
-				atFloor = true
-				//}
-			}
+		if !s.Entity.Rect.colliding(Right) {
+			s.movePlayer(-s.Speed, 0)
 		}
-		if !atFloor {
-			for _, z := range entities {
-				if z.Wasd == nil {
-					z.Position.X += -s.Speed
-				}
-			}
-		}
-		//s.Entity.Position.X += s.Speed
-		//x = -C.Components.Player.MoveSpeed
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		atFloor := false
-		for _, z := range Floors {
-			//if z.Entity != s.Entity {
-			if s.Entity.Rect.Left.Overlaps(z.Entity.Rect.Right) && z.Entity != s.Entity {
-				atFloor = true
-				//}
-			}
+		if !s.Entity.Rect.colliding(Left) {
+			s.movePlayer(s.Speed, 0)
 		}
-		if !atFloor {
-			for _, z := range entities {
-				if z.Wasd == nil {
-					z.Position.X += s.Speed
-				}
-			}
-		}
-		//s.Entity.Position.X += -s.Speed
-		//x = C.Components.Player.MoveSpeed
 	}
 }
 
@@ -119,6 +112,7 @@ type Gravity struct {
 var Gravitys []*Gravity
 
 func (s *Gravity) Pull() {
+
 	atFloor := false
 	for _, z := range Floors {
 		//if z.Entity != s.Entity {
@@ -130,11 +124,7 @@ func (s *Gravity) Pull() {
 	if !atFloor && s.Entity.Wasd == nil {
 		s.Entity.Position.Y += s.Speed
 	} else if !atFloor && s.Entity.Wasd != nil {
-		for _, z := range entities {
-			if z.Wasd == nil {
-				z.Position.Y += -s.Speed
-			}
-		}
+		s.Entity.Wasd.movePlayer(0, -s.Speed)
 	}
 
 }
