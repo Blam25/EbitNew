@@ -7,14 +7,14 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Position struct {
-	Entity *Entity
+type Position[T any] struct {
+	Entity *Entity[T]
 	X      float64
 	Y      float64
 }
 
 type Image struct {
-	Entity *Entity
+	Entity *Entity[any]
 	Image  *ebiten.Image
 	Op     ebiten.DrawImageOptions
 }
@@ -28,7 +28,7 @@ func (s *Image) Draw(screen *ebiten.Image) {
 }
 
 type Wasd struct {
-	Entity *Entity
+	Entity *Entity[any]
 	Speed  float64
 }
 
@@ -105,7 +105,7 @@ func (s *Wasd) Move() {
 }
 
 type Gravity struct {
-	Entity *Entity
+	Entity *Entity[any]
 	Speed  float64
 }
 
@@ -115,10 +115,8 @@ func (s *Gravity) Pull() {
 
 	atFloor := false
 	for _, z := range Floors {
-		//if z.Entity != s.Entity {
 		if s.Entity.Rect.Bottom.Overlaps(z.Entity.Rect.Top) && z.Entity != s.Entity {
 			atFloor = true
-			//}
 		}
 	}
 	if !atFloor && s.Entity.Wasd == nil {
@@ -132,7 +130,7 @@ func (s *Gravity) Pull() {
 var Rects []*Rect
 
 type Rect struct {
-	Entity *Entity
+	Entity *Entity[any]
 	Rect   I.Rectangle
 	Width  int
 	Height int
@@ -173,5 +171,5 @@ func (s *Rect) setRect() {
 var Floors []*Floor
 
 type Floor struct {
-	Entity *Entity
+	Entity *Entity[any]
 }
